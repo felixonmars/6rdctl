@@ -3,7 +3,7 @@ from __future__ import unicode_literals
 import socket
 import fcntl
 import struct
-from sh import ip
+from sh import ip, ErrorReturnCode_1
 from argparse import ArgumentParser
 
 
@@ -18,6 +18,12 @@ def get_ip_address(dev):
 
 if __name__ == "__main__":
     parser = ArgumentParser(description="6rd Control Tool")
+    parser.add_argument(
+        '-d', '--delete',
+        action="store_true",
+        default=False,
+        help="Remove the corresponding 6rd interface"
+    )
     parser.add_argument(
         '-i', '--interface',
         nargs='?',
@@ -76,14 +82,20 @@ if __name__ == "__main__":
         };
     };
     """
+    try:
+        ip.tunnel("del", _6rd_interface)
+    except ErrorReturnCode_1:
+        pass
 
-    if options.radvd:
-        with open("/etc/radvd.conf", "w") as f:
-            f.write((radvd_template % (options.radvd_interface, address)).encode("utf8"))
-            ip.addr.add(address + "64", "dev", options.radvd_interface)
+    if not options.delete:
 
-    ip.tunnel.add(_6rd_interface, "mode", "sit", "local", get_ip_address(options.interface), "ttl", 64)
-    ip.tunnel("6rd", "dev", _6rd_interface, "6rd-prefix", options.prefix + "::/32")
-    ip.addr.add(address + "32", "dev", _6rd_interface)
-    ip.link.set(_6rd_interface, "up")
-    ip.route.add("::/0", "via", "::" + options.router, "dev", _6rd_interface)
+        if options.radvd:
+            with open("/etc/radvd.conf", "w") as f:
+                f.write((radvd_template % (options.radvd_interface, address)).encode("utf8"))
+                ip.addr.add(address + "64", "dev", options.radvd_interface)
+
+        ip.tunnel.add(_6rd_interface, "mode", "sit", "local", get_ip_address(options.interface), "ttl", 64)
+        ip.tunnel("6rd", "dev", _6rd_interface, "6rd-prefix", options.prefix + "::/32")
+        ip.addr.add(address + "32", "dev", _6rd_interface)
+        ip.link.set(_6rd_interface, "up")
+        ip.route.add("::/0", "via", "::" + options.router, "dev", _6rd_interface)
