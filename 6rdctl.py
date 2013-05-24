@@ -55,6 +55,12 @@ if __name__ == "__main__":
         help='Specify custom IP to use for calculating 6rd address, default: gather from WAN interface',
     )
     parser.add_argument(
+        '--default-gateway',
+        nargs='store_true',
+        default=True,
+        help='Change IPv6 default gateway, default: True',
+    )
+    parser.add_argument(
         '--radvd',
         action="store_true",
         default=False,
@@ -64,7 +70,7 @@ if __name__ == "__main__":
         '--radvd-interface',
         nargs='?',
         default='eth1',
-        help="LAN interface to use, default: eth1"
+        help="LAN interface to use for radvd, default: eth1"
     )
 
     options = parser.parse_args()
@@ -104,4 +110,6 @@ if __name__ == "__main__":
         ip.tunnel("6rd", "dev", _6rd_interface, "6rd-prefix", options.prefix + "::/32")
         ip.addr.add(address + "32", "dev", _6rd_interface)
         ip.link.set(_6rd_interface, "up")
-        ip.route.add("::/0", "via", "::" + options.router, "dev", _6rd_interface)
+
+        if options.default_gateway:
+            ip.route.replace("::/0", "via", "::" + options.router, "dev", _6rd_interface)
