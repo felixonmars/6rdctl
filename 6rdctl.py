@@ -56,15 +56,15 @@ if __name__ == "__main__":
     )
     parser.add_argument(
         '--default-gateway',
-        nargs='store_true',
-        default=True,
-        help='Change IPv6 default gateway, default: True',
+        action='store_true',
+        default=False,
+        help='Change IPv6 default gateway, default: False',
     )
     parser.add_argument(
         '--radvd',
         action="store_true",
         default=False,
-        help="Change /etc/radvd.conf accordingly",
+        help="Change /etc/radvd.conf accordingly, default: False",
     )
     parser.add_argument(
         '--radvd-interface',
