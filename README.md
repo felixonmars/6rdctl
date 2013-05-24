@@ -19,6 +19,8 @@
       -d, --delete          Remove the corresponding 6rd interface
       -i [INTERFACE], --interface [INTERFACE]
                             WAN interface to use, default: eth0
+      -n [NEW_INTERFACE], --new-interface [NEW_INTERFACE]
+                            6rd interface to use, default: 6rd
       -p [PREFIX], --prefix [PREFIX]
                             6rd prefix to use, default: 2001:e41
       -r [ROUTER], --router [ROUTER]

@@ -31,6 +31,12 @@ if __name__ == "__main__":
         help='WAN interface to use, default: eth0',
     )
     parser.add_argument(
+        '-n', '--new-interface',
+        nargs='?',
+        default='6rd',
+        help='6rd interface to use, default: 6rd',
+    )
+    parser.add_argument(
         '-p', '--prefix',
         nargs='?',
         default='2001:e41',
@@ -66,7 +72,7 @@ if __name__ == "__main__":
     if not options.ip:
         options.ip = get_ip_address(options.interface)
 
-    _6rd_interface = "6rd"
+    _6rd_interface = options.new_interface
 
     address = options.prefix + ":{:02x}{:02x}:{:02x}{:02x}".format(*[int(x) for x in options.ip.split(".")]) + "::/"
 
